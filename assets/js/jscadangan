@@ -1,0 +1,80 @@
+let currentSlide = 1; // Start at the first real slide (the clone will be at index 0)
+const track = document.querySelector('.carousel-track');
+const slides = Array.from(track.children);
+const totalSlides = slides.length;
+const itemWidth = 300; // Width of each carousel item
+const gap = 20; // Space between items
+
+// Clone the first and last slides
+const firstSlideClone = slides[0].cloneNode(true);
+const lastSlideClone = slides[totalSlides - 1].cloneNode(true);
+track.insertBefore(lastSlideClone, slides[0]); // Add clone before the first slide
+track.appendChild(firstSlideClone); // Add clone after the last slide
+
+// Update total slides count
+const totalClonedSlides = totalSlides + 2; // Include clones
+
+function moveSlide(direction) {
+    // Update current slide index
+    currentSlide += direction;
+
+    // Check for the cloned slides
+    if (currentSlide === 0) {
+        // Move to the last real slide
+        currentSlide = totalClonedSlides - 2; // Go to the last real slide
+        track.style.transition = 'none'; // Disable transition for instant jump
+        track.style.transform = `translateX(${-currentSlide * (itemWidth + gap)}px)`; // Set position instantly
+        requestAnimationFrame(() => {
+            track.style.transition = 'transform 0.5s ease-in-out'; // Re-enable transition for smooth animation
+            const offset = -(currentSlide * (itemWidth + gap)) + 
+                           (track.parentElement.offsetWidth / 2 - (itemWidth / 2));
+            track.style.transform = `translateX(${offset}px)`;
+        });
+    } else if (currentSlide === totalClonedSlides - 1) {
+        // Move to the first real slide
+        currentSlide = 1; // Go to the first real slide
+        track.style.transition = 'none'; // Disable transition for instant jump
+        track.style.transform = `translateX(${-currentSlide * (itemWidth + gap)}px)`; // Set position instantly
+        requestAnimationFrame(() => {
+            track.style.transition = 'transform 0.5s ease-in-out'; // Re-enable transition for smooth animation
+            const offset = -(currentSlide * (itemWidth + gap)) + 
+                           (track.parentElement.offsetWidth / 2 - (itemWidth / 2));
+            track.style.transform = `translateX(${offset}px)`;
+        });
+    } else {
+        // Calculate the offset to center the active image
+        const offset = -(currentSlide * (itemWidth + gap)) + 
+                       (track.parentElement.offsetWidth / 2 - (itemWidth / 2));
+
+        // Add a transition for smooth sliding
+        track.style.transition = 'transform 0.5s ease-in-out';
+        track.style.transform = `translateX(${offset}px)`;
+    }
+}
+
+// Auto slide every 3 seconds
+setInterval(() => {
+    moveSlide(1);
+}, 5000);
+
+document.addEventListener("DOMContentLoaded", () => {
+    const imageInput = document.getElementById("imageInput");
+    const imagePreview = document.querySelector(".image-preview");
+
+    imageInput.addEventListener("change", (event) => {
+        const file = event.target.files[0]; // Ambil file yang dipilih
+        if (file) {
+            const reader = new FileReader(); // Membuat FileReader untuk membaca file
+            reader.onload = (e) => {
+                // Menampilkan gambar baru sebagai pratinjau
+                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file); // Membaca file sebagai URL data
+        }
+    });
+
+    // Klik ulang untuk mengganti gambar
+    imagePreview.addEventListener("click", () => {
+        imageInput.click(); // Simulasikan klik pada input file
+    });
+});
