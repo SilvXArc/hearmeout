@@ -30,7 +30,7 @@ $result = $conn->query($sql);
 </head>
 <body>
     <header>
-        <div class="mainlogo">Test Placeholder</div>
+        <div class="mainlogo"><img src ="assets/img/logo.png" class="logo-img"></div>
         <nav>
             <ul>
                 <li><a href="#">Submit</a></li>
